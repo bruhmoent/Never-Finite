@@ -2,6 +2,7 @@
     std::vector<Object> g_ColliderArray;
     std::vector<Object> g_NonColliderArray;
     std::vector<Object> g_PlayerArray;
+    std::vector<Object> g_InterActiveObjectArray;
 
     void Object::setVelocity(Object& object, sf::Vector2f newVelocity)
     {
@@ -23,6 +24,9 @@
         break;
     case 2:
         g_PlayerArray.push_back(*this);
+        break;
+    case 3:
+        g_InterActiveObjectArray.push_back(*this);
         break;
         }
     }
@@ -62,12 +66,26 @@
             }
         }
         break;
+    case 3:
+        for (int i = 0; i < g_InterActiveObjectArray.size(); i++)
+        {
+            if (g_InterActiveObjectArray[i].getShape().getGlobalBounds().contains(mousePosF))
+            {
+                g_InterActiveObjectArray.erase(g_InterActiveObjectArray.begin() + i);
+                break;
+            }
+        }
+        break;
         }
     }
 
     sf::RectangleShape Object::getShape() const
     {
         return m_shape;
+    }
+
+    bool Object::isColliding(const Object& other) const {
+        return m_shape.getGlobalBounds().intersects(other.m_shape.getGlobalBounds());
     }
 
 	void Object::applyGravity(Object& object, float gravity, float velocityLimit)
@@ -95,3 +113,41 @@
     sf::Vector2f Camera::getMovement() const { return m_movement; }
 
     sf::Vector2f Camera::getPosition() const { return m_position; }
+
+    void Camera::followObject(const sf::Vector2f& objectPos, sf::RenderWindow& window)
+    {
+        sf::View view = window.getView();
+        view.setCenter(objectPos);
+        window.setView(view);
+    }
+
+    void TextObject::setText(std::string text)
+    {
+        m_text.setString(text);
+    }
+
+    void TextObject::setPosition(int x, int y)
+    {
+        m_text.setPosition(x, y);
+    }
+
+    void TextObject::setColor(int r, int g, int b)
+    {
+        m_text.setFillColor(sf::Color(r, g, b));
+    }
+
+    void TextObject::setSize(int size)
+    {
+        m_text.setCharacterSize(size);
+    }
+
+    sf::Text TextObject::getText()
+    {
+        return m_text;
+    }
+
+    void Object::setPosition(Object& object, float x, float y)
+    {
+        object.m_shape.setPosition(x, y);
+        object.m_velocity = sf::Vector2f(0.0f, 0.0f);
+    }
