@@ -15,7 +15,7 @@ public:
 	sf::RectangleShape getShape() const;
 	virtual void createObject(int width, int length, int xstart, int ystart, int r, int g, int b, int type, bool isTransparent);
 	virtual void deleteObject(sf::Vector2f mousePos, int type);
-   	 bool isColliding(const Object& other) const;
+   	bool isColliding(const Object& other) const;
 	virtual void applyGravity(Object& object, float gravity, float velocityLimit);
 	virtual void applyVerticalMovement(Object& object, float x, float velocityLimit);
    	virtual void applyTexture(Object& object, const std::string& texturePath);
