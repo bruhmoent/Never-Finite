@@ -25,7 +25,7 @@ void createCoins(int radius, int amount)
 	{
 		int x = rand() % radius + 100;
 		int y = rand() % radius + 100;
-		g_objectClass.createObject(64, 64, x, y, 100, 55, 55, 3);
+		g_objectClass.createObject(64, 64, x, y, 250, 222, 40, 3, false);
 	}
 }
 
@@ -38,8 +38,10 @@ int main() {
 	extern std::vector<Object> g_InterActiveObjectArray;
 
 	sf::RenderWindow window(sf::VideoMode(800, 600), "Never Finite");
-	g_objectClass.createObject(64, 64, 0, 0, 255, 0, 0, 2);
-	g_objectClass.createObject(400, 64, 0, 400, 200, 0, 55, 0);
+	window.setFramerateLimit(60);
+	g_objectClass.createObject(64, 64, 0, 0, 255, 0, 0, 2, true);
+	g_objectClass.createObject(400, 64, 0, 400, 118, 68, 166, 0, false);
+	g_objectClass.applyTexture(g_PlayerArray[0], "images/player.png");
 	createCoins(g_spawnRadius, g_coinLimit);
 
 	while (window.isOpen())
@@ -55,7 +57,7 @@ int main() {
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
 				sf::Vector2f l_mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-				g_objectClass.createObject(64, 64, l_mousePos.x, l_mousePos.y, 0, 255, 0, 0);
+				g_objectClass.createObject(64, 64, l_mousePos.x, l_mousePos.y, 89, 10, 166, 0, false);
 			}
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 			{
@@ -97,18 +99,18 @@ int main() {
 			}
 		}
 
-		window.clear();
+		window.clear(sf::Color(48, 25, 52));
 
 		if (!g_playerObjectCollides) {
-			for (int i = 0; i < g_PlayerArray.size(); i++) { g_objectClass.applyGravity(g_PlayerArray[i], 0.5f, 1.0f); }
+			for (int i = 0; i < g_PlayerArray.size(); i++) { g_objectClass.applyGravity(g_PlayerArray[i], 5.0f, 5.0f); }
 			g_playerObjectCollides = false;
 		}
 
 		for (int i = 0; i < g_PlayerArray.size(); i++) {
 			g_text.setPosition(g_PlayerArray[i].getShape().getPosition().x + 250, g_PlayerArray[i].getShape().getPosition().y-300);
 			g_levelText.setPosition(g_PlayerArray[i].getShape().getPosition().x - 350, g_PlayerArray[i].getShape().getPosition().y - 300);
-			if (g_moveLeft) g_objectClass.applyVerticalMovement(g_PlayerArray[i], -0.5f, -1.0f);
-			if (g_moveRight) g_objectClass.applyVerticalMovement(g_PlayerArray[i], 0.5f, 1.0f);
+			if (g_moveLeft) g_objectClass.applyVerticalMovement(g_PlayerArray[i], -4.5f, -5.0f);
+			if (g_moveRight) g_objectClass.applyVerticalMovement(g_PlayerArray[i], 4.5f, 5.0f);
 		}
 
 		g_playerObjectCollides = false;
@@ -131,13 +133,13 @@ int main() {
 						if (g_PlayerArray[i].getShape().getPosition().x + g_PlayerArray[i].getShape().getSize().x / 2 < g_ColliderArray[j].getShape().getPosition().x) {
 							float direction = g_PlayerArray[i].getShape().getPosition().x - (g_ColliderArray[j].getShape().getPosition().x - g_PlayerArray[i].getShape().getSize().x);
 							if (direction > 0) {
-								g_objectClass.applyVerticalMovement(g_PlayerArray[i], 0.5f, 1.0f);
+								g_objectClass.setVelocity(g_PlayerArray[i], sf::Vector2f(0.0f, 0.0f));
 							}
 							else {
-								g_objectClass.applyVerticalMovement(g_PlayerArray[i], -0.5f, -1.0f);
+								g_objectClass.applyVerticalMovement(g_PlayerArray[i], -2.5f, -3.0f);
 							}
 							if (l_blockHeight > l_playerTop + (g_PlayerArray[i].getShape().getSize().y / 3)) {
-								g_objectClass.applyGravity(g_PlayerArray[i], -0.7f, -1.2f);
+								g_objectClass.applyGravity(g_PlayerArray[i], -5.0f, -5.2f);
 								g_PlayerArray[i].getShape().setPosition(g_ColliderArray[j].getShape().getPosition().x - g_PlayerArray[i].getShape().getSize().x, g_PlayerArray[i].getShape().getPosition().y);
 							}
 							g_PlayerArray[i].getShape().setPosition(g_ColliderArray[j].getShape().getPosition().x - g_PlayerArray[i].getShape().getSize().x, g_PlayerArray[i].getShape().getPosition().y);
@@ -168,7 +170,7 @@ int main() {
 			}
 		}
 
-		for (const auto& collider : g_ColliderArray){window.draw(collider.getShape());}
+		for (const auto& collider : g_ColliderArray){ window.draw(collider.getShape());}
 
 		for (const auto& nonCollider : g_NonColliderArray){window.draw(nonCollider.getShape());}
 
@@ -192,7 +194,12 @@ int main() {
 				g_objectClass.setVelocity(g_PlayerArray[i], sf::Vector2f(0.0f, 0.0f));
 			}
 			g_camera.setPosition(sf::Vector2f(0, 0));
-			g_objectClass.createObject(400, 64, 0, 400, 200, 0, 55, 0);
+			g_objectClass.createObject(400, 64, 0, 400, 118, 68, 166, 0, false);
+		}
+		for (int i = 0; i < g_PlayerArray.size(); i++)
+		{
+			g_PlayerArray[i].m_sprite.setPosition(g_PlayerArray[i].getShape().getPosition().x, g_PlayerArray[i].getShape().getPosition().y);
+			window.draw(g_PlayerArray[i].m_sprite);
 		}
 		window.display();
 	}
