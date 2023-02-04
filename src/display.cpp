@@ -4,12 +4,30 @@
 #include <windows.h>
 #include <iostream>
 #include "object.h"
+#include <cstdlib>
 
+const int g_spawnRadius = 1000;
+const int g_coinLimit = 10;
+int g_levelCount = 1;
+int g_coinCount = 0;
 Object g_objectClass;
 bool g_playerObjectCollides = false;
 bool g_moveLeft = false;
 bool g_moveRight = false;
 bool g_playerObjectJump = false;
+Camera g_camera;
+TextObject g_text("Coins: " + std::to_string(g_coinCount), 100, 100, 32, 255, 255, 255);
+TextObject g_levelText("Level: " + std::to_string(g_levelCount), 100, 100, 32, 255, 255, 255);
+
+void createCoins(int radius, int amount)
+{
+	for (int i = 0; i < amount; i++)
+	{
+		int x = rand() % radius + 100;
+		int y = rand() % radius + 100;
+		g_objectClass.createObject(64, 64, x, y, 100, 55, 55, 3);
+	}
+}
 
 int main() {
 
@@ -17,11 +35,13 @@ int main() {
 	extern std::vector<Object> g_ColliderArray;
 	extern std::vector<Object> g_NonColliderArray;
 	extern std::vector<Object> g_PlayerArray;
+	extern std::vector<Object> g_InterActiveObjectArray;
 
 	sf::RenderWindow window(sf::VideoMode(800, 600), "Never Finite");
 	g_objectClass.createObject(64, 64, 0, 0, 255, 0, 0, 2);
 	g_objectClass.createObject(400, 64, 0, 400, 200, 0, 55, 0);
-	
+	createCoins(g_spawnRadius, g_coinLimit);
+
 	while (window.isOpen())
 	{
 		while (window.pollEvent(event))
@@ -78,17 +98,22 @@ int main() {
 		}
 
 		window.clear();
+
 		if (!g_playerObjectCollides) {
 			for (int i = 0; i < g_PlayerArray.size(); i++) { g_objectClass.applyGravity(g_PlayerArray[i], 0.5f, 1.0f); }
 			g_playerObjectCollides = false;
 		}
 
 		for (int i = 0; i < g_PlayerArray.size(); i++) {
+			g_text.setPosition(g_PlayerArray[i].getShape().getPosition().x + 250, g_PlayerArray[i].getShape().getPosition().y-300);
+			g_levelText.setPosition(g_PlayerArray[i].getShape().getPosition().x - 350, g_PlayerArray[i].getShape().getPosition().y - 300);
 			if (g_moveLeft) g_objectClass.applyVerticalMovement(g_PlayerArray[i], -0.5f, -1.0f);
 			if (g_moveRight) g_objectClass.applyVerticalMovement(g_PlayerArray[i], 0.5f, 1.0f);
 		}
 
 		g_playerObjectCollides = false;
+
+		for (int i = 0; i < g_PlayerArray.size(); i++){ g_camera.followObject(g_PlayerArray[i].m_shape.getPosition(), window); }
 
 		for (int i = 0; i < g_PlayerArray.size(); i++) {
 			for (int j = 0; j < g_ColliderArray.size(); j++) {
@@ -132,12 +157,43 @@ int main() {
 			}
 		}
 
+		for (int i = 0; i < g_PlayerArray.size(); i++) {
+			for (int j = 0; j < g_InterActiveObjectArray.size(); j++) {
+				if (g_PlayerArray[i].isColliding(g_InterActiveObjectArray[j])) {
+					g_coinCount++;
+					g_text.setText("Coins: " + std::to_string(g_coinCount));
+					g_InterActiveObjectArray.erase(g_InterActiveObjectArray.begin() + j);
+					break;
+				}
+			}
+		}
+
 		for (const auto& collider : g_ColliderArray){window.draw(collider.getShape());}
 
 		for (const auto& nonCollider : g_NonColliderArray){window.draw(nonCollider.getShape());}
 
-		for (const auto& player : g_PlayerArray){window.draw(player.getShape());}
+		for (const auto& player : g_PlayerArray) { window.draw(player.getShape()); }
 
+		for (const auto& interactiveObject : g_InterActiveObjectArray){window.draw(interactiveObject.getShape());}
+
+		window.draw(g_text.getText());
+		window.draw(g_levelText.getText());
+
+		if (g_coinCount == g_coinLimit)
+		{
+			g_coinCount = 0;
+			g_ColliderArray.clear();
+			g_levelCount++;
+			createCoins(g_spawnRadius, g_coinLimit);
+			g_levelText.setText("Level: " + std::to_string(g_levelCount));
+			g_text.setText("Coins: " + std::to_string(g_coinCount));
+			for (int i = 0; i < g_PlayerArray.size(); i++) {
+				g_objectClass.setPosition(g_PlayerArray[i], 50.0f, 300.0f);
+				g_objectClass.setVelocity(g_PlayerArray[i], sf::Vector2f(0.0f, 0.0f));
+			}
+			g_camera.setPosition(sf::Vector2f(0, 0));
+			g_objectClass.createObject(400, 64, 0, 400, 200, 0, 55, 0);
+		}
 		window.display();
 	}
 	return 0;
