@@ -9,25 +9,32 @@
     	object.m_velocity = newVelocity;
     }
 
-    void Object::createObject(int width, int length, int xstart, int ystart, int r, int g, int b, int type)
+    void Object::createObject(int width, int length, int xstart, int ystart, int r, int g, int b, int type, bool isTransparent)
     {
-    m_shape = sf::RectangleShape(sf::Vector2f(width, length));
-    m_shape.setPosition(sf::Vector2f(xstart, ystart));
-    m_shape.setFillColor(sf::Color(r, g, b));
-    switch (type)
-    {
-    case 0:
-        g_ColliderArray.push_back(*this);
-        break;
-    case 1:
-        g_NonColliderArray.push_back(*this);
-        break;
-    case 2:
-        g_PlayerArray.push_back(*this);
-        break;
-    case 3:
-        g_InterActiveObjectArray.push_back(*this);
-        break;
+        m_shape = sf::RectangleShape(sf::Vector2f(width, length));
+        m_shape.setPosition(sf::Vector2f(xstart, ystart));
+        if (isTransparent)
+        {
+            m_shape.setFillColor(sf::Color(r, g, b, 0));
+        }
+        else
+        {
+            m_shape.setFillColor(sf::Color(r, g, b));
+        }
+        switch (type)
+        {
+        case 0:
+            g_ColliderArray.push_back(*this);
+            break;
+        case 1:
+            g_NonColliderArray.push_back(*this);
+            break;
+        case 2:
+            g_PlayerArray.push_back(*this);
+            break;
+        case 3:
+            g_InterActiveObjectArray.push_back(*this);
+            break;
         }
     }
 
@@ -150,4 +157,20 @@
     {
         object.m_shape.setPosition(x, y);
         object.m_velocity = sf::Vector2f(0.0f, 0.0f);
+    }
+    void Object::spriteFollow(Object& object, float x, float y)
+    {
+        object.m_sprite.setPosition(x, y);
+    }
+    void Object::applyTexture(Object& object, const std::string& texturePath)
+    {
+        sf::Texture *l_texture = new sf::Texture;
+        l_texture->setSmooth(true);
+        l_texture->setRepeated(true);
+        l_texture->loadFromFile(texturePath);
+        if (!l_texture->loadFromFile(texturePath))
+            return;
+        object.m_sprite.setTexture(*l_texture);
+        object.m_sprite.setPosition(object.m_shape.getPosition().x, object.m_shape.getPosition().y);
+        object.m_sprite.setTextureRect(sf::IntRect(0, 0, object.m_shape.getSize().x, object.m_shape.getSize().y));
     }
