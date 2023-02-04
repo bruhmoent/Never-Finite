@@ -8,14 +8,14 @@ public:
 	Object() : sf::RectangleShape(), m_velocity(sf::Vector2f(0.0f, 0.0f)) {}
 	sf::RectangleShape m_shape;
 	sf::Vector2f m_velocity;
-    sf::Sprite m_sprite;
-    void spriteFollow(Object& object, float x, float y);
+    	sf::Sprite m_sprite;
+    	void spriteFollow(Object& object, float x, float y);
 	void setVelocity(Object& object, sf::Vector2f newVelocity);
-    virtual void setPosition(Object& object, float x, float y);
+    	virtual void setPosition(Object& object, float x, float y);
 	sf::RectangleShape getShape() const;
 	virtual void createObject(int width, int length, int xstart, int ystart, int r, int g, int b, int type, bool isTransparent);
 	virtual void deleteObject(sf::Vector2f mousePos, int type);
-    bool isColliding(const Object& other) const;
+   	 bool isColliding(const Object& other) const;
 	virtual void applyGravity(Object& object, float gravity, float velocityLimit);
 	virtual void applyVerticalMovement(Object& object, float x, float velocityLimit);
     virtual void applyTexture(Object& object, const std::string& texturePath);
