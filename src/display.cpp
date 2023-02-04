@@ -133,7 +133,7 @@ int main() {
 						if (g_PlayerArray[i].getShape().getPosition().x + g_PlayerArray[i].getShape().getSize().x / 2 < g_ColliderArray[j].getShape().getPosition().x) {
 							float direction = g_PlayerArray[i].getShape().getPosition().x - (g_ColliderArray[j].getShape().getPosition().x - g_PlayerArray[i].getShape().getSize().x);
 							if (direction > 0) {
-								g_objectClass.setVelocity(g_PlayerArray[i], sf::Vector2f(0.0f, 0.0f));
+								g_objectClass.applyGravity(g_PlayerArray[i], 3.0f, 3.0f);
 							}
 							else {
 								g_objectClass.applyVerticalMovement(g_PlayerArray[i], -2.5f, -3.0f);
