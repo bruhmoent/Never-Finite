@@ -18,7 +18,7 @@ public:
    	 bool isColliding(const Object& other) const;
 	virtual void applyGravity(Object& object, float gravity, float velocityLimit);
 	virtual void applyVerticalMovement(Object& object, float x, float velocityLimit);
-    virtual void applyTexture(Object& object, const std::string& texturePath);
+   	virtual void applyTexture(Object& object, const std::string& texturePath);
 };
 
 class Camera
