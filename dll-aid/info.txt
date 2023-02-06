@@ -1,0 +1,3 @@
+If you are having runtime errors, here's what you can do:
+- Install  the VC Redist (x64+) package,
+- Move the .dll files from this folder, to the main folder.
